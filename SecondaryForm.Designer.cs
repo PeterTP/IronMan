@@ -1,6 +1,6 @@
 ﻿namespace IronMan
 {
-    partial class FormulationLineForm
+    partial class SecondaryForm
     {
         /// <summary>
         /// Required designer variable.
@@ -34,7 +34,7 @@
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.LotNoComboBox = new System.Windows.Forms.ComboBox();
-            this.prod = new System.Windows.Forms.Label();
+            this.ProcessLabel = new System.Windows.Forms.Label();
             this.SaveButton = new System.Windows.Forms.Button();
             this.Judgement = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Entry = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -113,15 +113,15 @@
             this.LotNoComboBox.TabIndex = 10;
             this.LotNoComboBox.Text = "38001";
             // 
-            // prod
+            // ProcessLabel
             // 
-            this.prod.AutoSize = true;
-            this.prod.Location = new System.Drawing.Point(81, 32);
-            this.prod.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.prod.Name = "prod";
-            this.prod.Size = new System.Drawing.Size(105, 16);
-            this.prod.TabIndex = 11;
-            this.prod.Text = "Formulation Line";
+            this.ProcessLabel.AutoSize = true;
+            this.ProcessLabel.Location = new System.Drawing.Point(81, 32);
+            this.ProcessLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.ProcessLabel.Name = "ProcessLabel";
+            this.ProcessLabel.Size = new System.Drawing.Size(110, 16);
+            this.ProcessLabel.TabIndex = 11;
+            this.ProcessLabel.Text = "Secondary Label";
             // 
             // SaveButton
             // 
@@ -226,7 +226,7 @@
             this.TabControl.Size = new System.Drawing.Size(690, 310);
             this.TabControl.TabIndex = 0;
             // 
-            // FormulationLineForm
+            // SecondaryForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -238,14 +238,14 @@
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.LotNoComboBox);
-            this.Controls.Add(this.prod);
+            this.Controls.Add(this.ProcessLabel);
             this.Controls.Add(this.TabControl);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.Name = "FormulationLineForm";
+            this.Name = "SecondaryForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
-            this.Text = "Formulation Line";
-            this.Load += new System.EventHandler(this.FormulationLineForm_Load);
+            this.Text = "Secondary Form";
+            this.Load += new System.EventHandler(this.SecondaryForm_Load);
             ((System.ComponentModel.ISupportInitialize)(this.ExampleDataGrid)).EndInit();
             this.ExampleTabPage.ResumeLayout(false);
             this.TabControl.ResumeLayout(false);
@@ -261,7 +261,7 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.ComboBox LotNoComboBox;
-        private System.Windows.Forms.Label prod;
+        private System.Windows.Forms.Label ProcessLabel;
         private System.Windows.Forms.Button SaveButton;
         private System.Windows.Forms.DataGridViewTextBoxColumn Judgement;
         private System.Windows.Forms.DataGridViewTextBoxColumn Entry;

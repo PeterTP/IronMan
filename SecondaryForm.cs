@@ -11,13 +11,14 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement.Header;
 
 namespace IronMan
 {
-    public partial class FormulationLineForm : Form
+    public partial class SecondaryForm : Form
     {
         public MainForm parent;
         public DataTable configDataTable;
         public string processLine;
+        public string process;
 
-        public FormulationLineForm()
+        public SecondaryForm()
         {
             InitializeComponent();
         }
@@ -26,6 +27,12 @@ namespace IronMan
         {
             parent.ExecuteSql("");
         }
+
+        //public void SetProcess(string a)
+        //{
+        //    Text = a;
+        //    ProcessLabel.Text = a;
+        //}
 
         private DataGridView CreateDataGrid(TabPage tabPage, string subGroup)
         {
@@ -103,8 +110,10 @@ namespace IronMan
             }
         }
 
-        private void FormulationLineForm_Load(object sender, EventArgs e)
+        private void SecondaryForm_Load(object sender, EventArgs e)
         {
+            Text = process;
+            ProcessLabel.Text = process;
             ProcessLineComboBox.Text = processLine;
             InititalizeTabs();
         }
@@ -124,7 +133,7 @@ namespace IronMan
                 if (specDataTable.Rows.Count > 0)
                 {
                     DataRow specDataRow = specDataTable.Rows[0];
-                    double min = 0, max = 0;
+                    double min, max;
 
                     if (field.StartsWith("Sample Weight"))
                     {

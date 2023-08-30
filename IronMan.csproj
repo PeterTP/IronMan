@@ -49,46 +49,19 @@
     <Compile Include="MainForm.Designer.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="RawMaterialForm.cs">
+    <Compile Include="SecondaryForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="RawMaterialForm.Designer.cs">
-      <DependentUpon>RawMaterialForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="TablettingLineForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="TablettingLineForm.Designer.cs">
-      <DependentUpon>TablettingLineForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="FormulationLineForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="FormulationLineForm.Designer.cs">
-      <DependentUpon>FormulationLineForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="KneadingLineForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="KneadingLineForm.Designer.cs">
-      <DependentUpon>KneadingLineForm.cs</DependentUpon>
+    <Compile Include="SecondaryForm.Designer.cs">
+      <DependentUpon>SecondaryForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="RawMaterialForm.resx">
-      <DependentUpon>RawMaterialForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="TablettingLineForm.resx">
-      <DependentUpon>TablettingLineForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="FormulationLineForm.resx">
-      <DependentUpon>FormulationLineForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="KneadingLineForm.resx">
-      <DependentUpon>KneadingLineForm.cs</DependentUpon>
+    <EmbeddedResource Include="SecondaryForm.resx">
+      <DependentUpon>SecondaryForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

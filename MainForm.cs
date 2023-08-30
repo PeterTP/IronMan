@@ -200,37 +200,42 @@ namespace IronMan
             var formLocation = this.Location;
             formLocation.Offset(this.Size.Width, 0);
 
+            SecondaryForm form = new SecondaryForm
+            {
+                Location = formLocation,
+                parent = this,
+                configDataTable = currentDataTable,
+                processLine = e.ClickedItem.Text,
+            };
+
             switch (currentMainLevel)
             {
+                case "raw_material":
+                    form.process = "Raw Material";
+                    break;
                 case "formulation":
-                    FormulationLineForm fl_form = new FormulationLineForm
-                    {
-                        Location = formLocation,
-                        parent = this,
-                        configDataTable = currentDataTable,
-                        processLine = e.ClickedItem.Text
-                    };
-                    fl_form.ShowDialog();
+                    form.process = "Formulation Line";
                     break;
                 case "kneading":
-                    KneadingLineForm kl_form = new KneadingLineForm
-                    {
-                        Location = formLocation,
-                        parent = this,
-                        configDataTable = currentDataTable,
-                        processLine = e.ClickedItem.Text
-                    };
-                    kl_form.ShowDialog();
+                    form.process = "Kneading Line";
+                    break;
+                case "tabletting":
+                    form.process = "Tabletting Line";
+                    break;
+                case "side_process":
+                    form.process = "Side Process";
                     break;
             }
+
+            form.ShowDialog();
         }
 
         private void RawMaterialButton_Click(object sender, EventArgs e)
         {
             //ExecuteSQL("select * from public.ironman_menuconfig");
             SetButtonProperties(RawMaterialButton);
-            RawMaterialForm form = new RawMaterialForm();
-            form.ShowDialog();
+            //RawMaterialForm form = new RawMaterialForm();
+            //form.ShowDialog();
         }
 
         private void FormulationLinesButton_Click(object sender, EventArgs e)
@@ -263,29 +268,25 @@ namespace IronMan
         private void F1Button_Click(object sender, EventArgs e)
         {
             SetButtonProperties(F1Button);
-            FormulationLineForm form = new FormulationLineForm();
+            SecondaryForm form = new SecondaryForm();
             form.ShowDialog();
         }
 
         private void F2Button_Click(object sender, EventArgs e)
         {
             SetButtonProperties(F2Button);
-            FormulationLineForm form = new FormulationLineForm();
+            SecondaryForm form = new SecondaryForm();
             form.ShowDialog();
         }
 
         private void K1Button_Click(object sender, EventArgs e)
         {
             SetButtonProperties(K1Button);
-            KneadingLineForm form = new KneadingLineForm();
-            form.ShowDialog();
         }
 
         private void K2Button_Click(object sender, EventArgs e)
         {
             SetButtonProperties(K1Button);
-            KneadingLineForm form = new KneadingLineForm();
-            form.ShowDialog();
         }
 
         private void K3Button_Click(object sender, EventArgs e)
