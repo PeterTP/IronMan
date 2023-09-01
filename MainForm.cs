@@ -129,19 +129,26 @@ namespace IronMan
         private void InstantiateMenu(Button button, string mainKey, string subKey)
         {
             string sql = string.Format("select public.ironman_menuconfig.sublevel, public.ironman_menuconfig.subgroup from public.ironman_menuconfig where public.ironman_menuconfig.mainlevel = '{0}'", mainKey);
-            currentReader = ExecuteSql(sql);
             DataTable dt = new DataTable();
-            dt.Load(currentReader);
+            dt.Load(ExecuteSql(sql));
             HashSet<string> itemSet = new HashSet<string>();
 
             currentMainLevel = mainKey;
             currentDataTable = dt;
 
-            foreach (DataRow row in dt.Rows)
+            if (subKey != null)
             {
-                string item = row["sublevel"].ToString().Split('_')[0];
-                if (item.StartsWith(subKey) && char.IsDigit(item[subKey.Length]))
-                    itemSet.Add(item);
+                foreach (DataRow row in dt.Rows)
+                {
+                    string item = row["sublevel"].ToString().Split('_')[0];
+                    if (item.StartsWith(subKey) && char.IsDigit(item[subKey.Length]))
+                        itemSet.Add(item);
+                }
+            }
+            else
+            {
+                foreach (DataRow row in dt.Rows)
+                    itemSet.Add(row["sublevel"].ToString().Split('_')[0]);
             }
 
             ButtonMenu.Items.Clear();
@@ -232,10 +239,8 @@ namespace IronMan
 
         private void RawMaterialButton_Click(object sender, EventArgs e)
         {
-            //ExecuteSQL("select * from public.ironman_menuconfig");
+            InstantiateMenu(RawMaterialButton, "raw_material", null);
             SetButtonProperties(RawMaterialButton);
-            //RawMaterialForm form = new RawMaterialForm();
-            //form.ShowDialog();
         }
 
         private void FormulationLinesButton_Click(object sender, EventArgs e)
@@ -252,11 +257,13 @@ namespace IronMan
 
         private void TablettingLinesButton_Click(object sender, EventArgs e)
         {
+            InstantiateMenu(KneadingLinesButton, "tabletting", null);
             SetButtonProperties(TablettingLinesButton);
         }
 
         private void SideProcessButton_Click(object sender, EventArgs e)
         {
+            InstantiateMenu(SideProcessButton, "side_process", null);
             SetButtonProperties(SideProcessButton, SideProcessGroupBox);
         }
 

@@ -93,9 +93,9 @@ namespace IronMan
             configDataTable.AcceptChanges();
 
             // Create tabs and datagrids
-            foreach (DataRow row in configDataTable.Rows)
+            if (configDataTable.Rows.Count == 1 && configDataTable.Rows[0]["sublevel"].ToString() == processLine)
             {
-                string tabName = row["sublevel"].ToString().Split('_')[1];
+                string tabName = processLine;
                 TabPage tabPage = new TabPage
                 {
                     Text = tabName,
@@ -103,10 +103,28 @@ namespace IronMan
                     UseVisualStyleBackColor = true
                 };
 
-                tabPage.Controls.Add(CreateDataGrid(tabPage, row["subgroup"].ToString()));
+                tabPage.Controls.Add(CreateDataGrid(tabPage, configDataTable.Rows[0]["subgroup"].ToString()));
                 //Must set padding after adding the dataGrid so it can resize the datagrid
                 tabPage.Padding = new Padding(4);
                 TabControl.Controls.Add(tabPage);
+            }
+            else
+            {
+                foreach (DataRow row in configDataTable.Rows)
+                {
+                    string tabName = row["sublevel"].ToString().Split('_')[1];
+                    TabPage tabPage = new TabPage
+                    {
+                        Text = tabName,
+                        Name = tabName + "TabPage",
+                        UseVisualStyleBackColor = true
+                    };
+
+                    tabPage.Controls.Add(CreateDataGrid(tabPage, row["subgroup"].ToString()));
+                    //Must set padding after adding the dataGrid so it can resize the datagrid
+                    tabPage.Padding = new Padding(4);
+                    TabControl.Controls.Add(tabPage);
+                }
             }
         }
 
