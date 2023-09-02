@@ -133,7 +133,14 @@ namespace IronMan
             Text = process;
             ProcessLabel.Text = process;
             ProcessLineComboBox.Text = processLine;
-            InititalizeTabs();
+            if (configDataTable.Rows[0]["subgroup"].ToString() != "")
+            {
+                InititalizeTabs();
+            } 
+            else
+            {
+                TabControl.Dispose();
+            }
         }
 
         private void DataGridView_CellEndEdit(object sender, DataGridViewCellEventArgs e)
