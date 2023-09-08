@@ -11,8 +11,7 @@ namespace IronMan
 {
     public partial class MainForm : Form
     {
-        private OdbcConnection postgreSQLConn, oracleConn;
-        private OdbcDataReader currentReader;
+        public OdbcConnection postgreSQLConn, oracleConn;
         private DataTable currentDataTable;
         private string currentMainLevel;
 
@@ -125,6 +124,22 @@ namespace IronMan
                 return null;
             }
         }
+
+        //public OdbcDataReader ExecuteSql(OdbcCommand cmd)
+        //{
+        //    try
+        //    {
+        //        if (postgreSQLConn.State != ConnectionState.Open)
+        //            postgreSQLConn.Open();
+        //        cmd.ExecuteNonQuery();
+        //        return null;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        MessageBox.Show("Error, Cannot Connect to Server " + ex);
+        //        return null;
+        //    }
+        //}
 
         private void InstantiateMenu(Button button, string mainKey, string subKey)
         {

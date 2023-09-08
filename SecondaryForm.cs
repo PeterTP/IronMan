@@ -17,15 +17,11 @@ namespace IronMan
         public DataTable configDataTable;
         public string processLine;
         public string process;
+        public Dictionary<string, DataGridView> dataGrids; // Used to reference datagrid using page name
 
         public SecondaryForm()
         {
             InitializeComponent();
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            parent.ExecuteSql("");
         }
 
         //public void SetProcess(string a)
@@ -39,7 +35,7 @@ namespace IronMan
             // Get subgroup table
             HashSet<string> subGroupSet = new HashSet<string>();
             var groupDataTable = new DataTable();
-            string groupSql = "select public.ironman_subgroup.subgroup, public.ironman_subgroup.field_names from public.ironman_subgroup where ";
+            string groupSql = "select public.ironman_subgroup.subgroup, public.ironman_subgroup.field_names, public.ironman_subgroup.field_units from public.ironman_subgroup where ";
             string groupTemplateSql = "public.ironman_subgroup.subgroup = '{0}'";
 
             foreach (DataRow configRow in configDataTable.Rows)
@@ -63,6 +59,7 @@ namespace IronMan
             {
                 new DataGridViewTextBoxColumn{HeaderText="Field"},
                 new DataGridViewTextBoxColumn{HeaderText="Entry"},
+                new DataGridViewTextBoxColumn{HeaderText="Units", ReadOnly=true},
                 new DataGridViewTextBoxColumn{HeaderText="Judgement"},
                 new DataGridViewTextBoxColumn{HeaderText="ActionSheetNo"}
             });
@@ -71,9 +68,10 @@ namespace IronMan
             DataRow groupRow = groupDataTable.Select(
                 string.Format("subgroup = '{0}'", subGroup))[0];
             string[] groupFields = groupRow["field_names"].ToString().Split(';');
-            // TODO Confirm that spaces should be removed
-            foreach (string fieldName in groupFields)
-                dataGrid.Rows.Add(new string[] { fieldName.Trim(' '), "-1", "-", "" });
+            string[] groupUnits = groupRow["field_units"].ToString().Split(';');
+
+            for (int i = 0; i < groupFields.Length; i++)
+                dataGrid.Rows.Add(new string[] { groupFields[i].Trim(' '), "-1", groupUnits[i].Trim(' '), "-", "" });
 
             dataGrid.CellEndEdit += new DataGridViewCellEventHandler(DataGridView_CellEndEdit);
             return dataGrid;
@@ -103,7 +101,9 @@ namespace IronMan
                     UseVisualStyleBackColor = true
                 };
 
-                tabPage.Controls.Add(CreateDataGrid(tabPage, configDataTable.Rows[0]["subgroup"].ToString()));
+                DataGridView dataGrid = CreateDataGrid(tabPage, configDataTable.Rows[0]["subgroup"].ToString());
+                dataGrids.Add(tabName, dataGrid);
+                tabPage.Controls.Add(dataGrid);
                 //Must set padding after adding the dataGrid so it can resize the datagrid
                 tabPage.Padding = new Padding(4);
                 TabControl.Controls.Add(tabPage);
@@ -120,7 +120,9 @@ namespace IronMan
                         UseVisualStyleBackColor = true
                     };
 
-                    tabPage.Controls.Add(CreateDataGrid(tabPage, row["subgroup"].ToString()));
+                    DataGridView dataGrid = CreateDataGrid(tabPage, row["subgroup"].ToString());
+                    dataGrids.Add(tabName, dataGrid);
+                    tabPage.Controls.Add(dataGrid);
                     //Must set padding after adding the dataGrid so it can resize the datagrid
                     tabPage.Padding = new Padding(4);
                     TabControl.Controls.Add(tabPage);
@@ -133,20 +135,18 @@ namespace IronMan
             Text = process;
             ProcessLabel.Text = process;
             ProcessLineComboBox.Text = processLine;
+            dataGrids = new Dictionary<string, DataGridView>();
             if (configDataTable.Rows[0]["subgroup"].ToString() != "")
-            {
                 InititalizeTabs();
-            } 
             else
-            {
                 TabControl.Dispose();
-            }
         }
 
         private void DataGridView_CellEndEdit(object sender, DataGridViewCellEventArgs e)
         {
             string header = ((DataGridView)sender).Columns[e.ColumnIndex].HeaderText;
-            if (header == "Entry")
+            if (header == "Entry" && (string)((DataGridView)sender)[e.ColumnIndex, e.RowIndex].Value != "")
+            // ^^^ Fun fact: The 2nd comparison here is because empty fields get converted to 0
             {
                 double value = Convert.ToDouble(((DataGridView)sender)[e.ColumnIndex, e.RowIndex].Value);
                 string field = ((DataGridView)sender)[0, e.RowIndex].Value.ToString();
@@ -177,21 +177,111 @@ namespace IronMan
                     }
                     else
                     {
-                        ((DataGridView)sender)[2, e.RowIndex].Value = "-";
+                        ((DataGridView)sender)[3, e.RowIndex].Value = "-";
                         return;
                     }
                     if (value >= min && value <= max)
-                        ((DataGridView)sender)[2, e.RowIndex].Value = "ACCEPT";
+                        ((DataGridView)sender)[3, e.RowIndex].Value = "ACCEPT";
                     else
-                        ((DataGridView)sender)[2, e.RowIndex].Value = "REJECT";
+                        ((DataGridView)sender)[3, e.RowIndex].Value = "REJECT";
                 }
             }
         }
 
         private void SaveButton_Click(object sender, EventArgs e)
         {
-            //TODO
-            return;
+            //string insertSqlTemplate2 = "insert into public.ironman_data values (" +
+            //    "'@ironman_process', " +
+            //    "'@machine_id', " +
+            //    "'@entry_date', " +
+            //    "'@product_name', " +
+            //    "'@lot_nos', " +
+            //    "'@emp_id', " +
+            //    "'@field', " +
+            //    "'@vl', " +
+            //    "'@unit', " +
+            //    "'@judgement', " +
+            //    "'@action_sheet')";
+
+            //OdbcDataReader nowReader = parent.ExecuteSql("select now()::timestamp");
+            //byte[] now = new byte[] {0};
+            //while (nowReader.Read()) now[0] = nowReader.GetByte(0);
+           
+            string insertSqlTemplate = "insert into public.ironman_data values ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}', '{10}')";
+
+            Dictionary<string, string> dataResults = new Dictionary<string, string>
+            {
+                {"ironman_process", process},
+                {"machine_id", processLine},
+                {"entry_date", DateTime.Now.ToString("s")},
+                {"product_name", ProductNameComboBox.Text.ToString()},
+                {"lot_nos", LotNoComboBox.Text.ToString()},
+                {"emp_id", ""},
+                {"field", ""},
+                {"vl", ""},
+                {"unit", ""},
+                {"judgement", ""},
+                {"action_sheet", ""}
+            };
+
+            try
+            {
+
+                foreach (TabPage page in TabControl.TabPages)
+                {
+                    DataGridView dataGrid = dataGrids[page.Text];
+
+                    foreach (DataGridViewRow row in dataGrid.Rows)
+                    {
+                        dataResults["field"] = row.Cells[0].Value.ToString();
+                        dataResults["vl"] = row.Cells[1].Value.ToString();
+                        dataResults["unit"] = row.Cells[2].Value.ToString();
+                        dataResults["judgement"] = row.Cells[3].Value.ToString();
+                        dataResults["action_sheet"] = row.Cells[4].Value.ToString();
+                    }
+
+                    //OdbcCommand cmd = new OdbcCommand(insertSqlTemplate, parent.postgreSQLConn);
+                    //
+                    //foreach (var data in dataResults)
+                    //{
+                    //    if (data.Key == "entry_date")
+                    //    {
+                    //        cmd.Parameters.Add('@' + data.Key, OdbcType.Timestamp);
+                    //        cmd.Parameters['@' + data.Key].Value = now;
+                    //    }
+                    //    else
+                    //    {
+                    //        cmd.Parameters.Add('@' + data.Key, OdbcType.VarChar);
+                    //        cmd.Parameters['@' + data.Key].Value = data.Value;
+                    //    }
+                    //}
+
+                    string insertSql = String.Format(
+                        insertSqlTemplate,
+                        dataResults["ironman_process"],
+                        dataResults["machine_id"],
+                        dataResults["entry_date"],
+                        dataResults["product_name"],
+                        dataResults["lot_nos"],
+                        dataResults["emp_id"],
+                        dataResults["field"],
+                        dataResults["vl"],
+                        dataResults["unit"],
+                        dataResults["judgement"],
+                        dataResults["action_sheet"]
+                    );
+
+                    parent.ExecuteSql(insertSql);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Saving Failed!" + ex);
+            }
+            finally
+            {
+                MessageBox.Show("Saved Successfully!");
+            }
         }
     }
 }
