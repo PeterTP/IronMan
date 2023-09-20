@@ -58,8 +58,8 @@
             this.DataTab = new System.Windows.Forms.TabPage();
             this.tableLayoutPanel4 = new System.Windows.Forms.TableLayoutPanel();
             this.tableLayoutPanel5 = new System.Windows.Forms.TableLayoutPanel();
-            this.textBox3 = new System.Windows.Forms.TextBox();
             this.label5 = new System.Windows.Forms.Label();
+            this.textBox3 = new System.Windows.Forms.TextBox();
             this.DataDataGrid = new System.Windows.Forms.DataGridView();
             this.ConfigTab = new System.Windows.Forms.TabPage();
             this.tableLayoutPanel6 = new System.Windows.Forms.TableLayoutPanel();
@@ -241,6 +241,7 @@
             this.LotsDataGrid.RowTemplate.Height = 24;
             this.LotsDataGrid.Size = new System.Drawing.Size(892, 269);
             this.LotsDataGrid.TabIndex = 1;
+            this.LotsDataGrid.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.DataGrid_Modified);
             // 
             // TabControl
             // 
@@ -447,6 +448,7 @@
             this.ProductsDataGrid.RowTemplate.Height = 24;
             this.ProductsDataGrid.Size = new System.Drawing.Size(892, 402);
             this.ProductsDataGrid.TabIndex = 4;
+            this.ProductsDataGrid.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.DataGrid_Modified);
             // 
             // DataTab
             // 
@@ -493,6 +495,15 @@
             this.tableLayoutPanel5.Size = new System.Drawing.Size(892, 49);
             this.tableLayoutPanel5.TabIndex = 2;
             // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(3, 0);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(86, 32);
+            this.label5.TabIndex = 3;
+            this.label5.Text = "Filter";
+            // 
             // textBox3
             // 
             this.textBox3.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -502,15 +513,6 @@
             this.textBox3.Name = "textBox3";
             this.textBox3.Size = new System.Drawing.Size(735, 39);
             this.textBox3.TabIndex = 1;
-            // 
-            // label5
-            // 
-            this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(3, 0);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(86, 32);
-            this.label5.TabIndex = 3;
-            this.label5.Text = "Filter";
             // 
             // DataDataGrid
             // 
@@ -525,6 +527,7 @@
             this.DataDataGrid.RowTemplate.Height = 24;
             this.DataDataGrid.Size = new System.Drawing.Size(892, 402);
             this.DataDataGrid.TabIndex = 3;
+            this.DataDataGrid.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.DataGrid_Modified);
             // 
             // ConfigTab
             // 
@@ -567,6 +570,7 @@
             this.SubgroupDataGrid.RowTemplate.Height = 24;
             this.SubgroupDataGrid.Size = new System.Drawing.Size(892, 226);
             this.SubgroupDataGrid.TabIndex = 1;
+            this.SubgroupDataGrid.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.DataGrid_Modified);
             // 
             // MenuDataGrid
             // 
@@ -581,6 +585,7 @@
             this.MenuDataGrid.RowTemplate.Height = 24;
             this.MenuDataGrid.Size = new System.Drawing.Size(892, 225);
             this.MenuDataGrid.TabIndex = 0;
+            this.MenuDataGrid.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.DataGrid_Modified);
             // 
             // SpecsTab
             // 
@@ -606,6 +611,7 @@
             this.SpecsDataGrid.RowTemplate.Height = 24;
             this.SpecsDataGrid.Size = new System.Drawing.Size(898, 463);
             this.SpecsDataGrid.TabIndex = 0;
+            this.SpecsDataGrid.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.DataGrid_Modified);
             // 
             // AdminForm
             // 

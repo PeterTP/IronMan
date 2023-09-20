@@ -8,14 +8,19 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using System.Windows.Forms;
+using System.Data.Common;
+using System.Data.SqlClient;
 
 namespace IronMan
 {
     public partial class AdminForm : Form
     {
         public OdbcConnection postgreSQLConn;
-        public Dictionary<string, DataGridView[]> dataGrids; // Used to reference datagrid using page name
-        public Dictionary<DataGridView, string> tableNames; // Used to reference tablename using datagrid
+
+        private Dictionary<string, DataGridView[]> dataGrids; // Used to reference datagrid using page name
+        private Dictionary<DataGridView, string> tableNames; // Used to reference tablename using datagrid
+        //private Dictionary<DataGridView, DataTable> currentDataTables = new Dictionary<DataGridView, DataTable>(); // Used to reference dataset using current datagrids
+        //private Dictionary<DataGridView, OdbcDataAdapter> currentAdapters = new Dictionary<DataGridView, OdbcDataAdapter>();
 
         public AdminForm()
         {
@@ -119,14 +124,25 @@ namespace IronMan
 
             try //TODO better way to check if key exists
             {
+                //currentDataTables.Clear();
                 foreach (DataGridView dataGrid in dataGrids[tabName])
                 {
-                    DataTable dataGridDataTable = new DataTable();
-                    dataGridDataTable.Load(ExecuteSql(String.Format(dataSqlTemplate, tableNames[dataGrid])));
-                    dataGrid.DataSource = dataGridDataTable;
+                    DataTable dt = new DataTable();
+                    dt.Load(ExecuteSql(string.Format(dataSqlTemplate, tableNames[dataGrid])));
+                    dataGrid.DataSource = dt;
+                    //OdbcDataAdapter currentAdapter = new OdbcDataAdapter
+                    //{
+                    //    SelectCommand = new OdbcCommand(String.Format(dataSqlTemplate, tableNames[dataGrid]), postgreSQLConn)
+                    //};
+                    //OdbcCommandBuilder cmdBuilder = new OdbcCommandBuilder(currentAdapter);
+                    //currentAdapter.UpdateCommand = cmdBuilder.GetUpdateCommand();
+                    //currentAdapter.Fill(dt);
+
+                    //currentAdapters[dataGrid] = currentAdapter;
+                    //currentDataTables[dataGrid] = dt;
                 }
             }
-            catch (Exception ex)
+            catch
             {
                 return;
             }
@@ -149,7 +165,7 @@ namespace IronMan
             {
                 while (loginReader.Read()) { password = loginReader.GetString(0); }
             }
-            catch (Exception ex)
+            catch
             {
                 MessageBox.Show("Input Error. Please try again");
                 return;
@@ -164,6 +180,25 @@ namespace IronMan
         private void TabControl_SelectedIndexChanged(object sender, EventArgs e)
         {
             FillDataGrid(TabControl.SelectedTab.Text);
+        }
+
+        private void DataGrid_Modified(object sender, DataGridViewCellEventArgs e)
+        {
+            //DataGridView dataGrid = ((DataGridView)sender);
+            //dataGrid.EndEdit(); //very important step
+            //DataTable changes = currentDataTables[dataGrid].GetChanges();
+            //OdbcCommandBuilder cmdBuilder = new OdbcCommandBuilder(currentAdapters[dataGrid]);
+            //currentAdapters[dataGrid].UpdateCommand = cmdBuilder.GetUpdateCommand();
+            //currentAdapters[dataGrid].Update(currentDataTables[dataGrid]);
+            //MessageBox.Show("Updated");
+
+            // TODO It will be nicer if I can get the dataset that datagrid belongs to directly
+            // instead of using a dictionary to reference
+            //cmdBuilder = new OdbcCommandBuilder(currentAdapters[(DataGridView)sender]);
+            //var a = ((DataTable)sender).GetChanges();
+            //DataTable changes = currentDataTables[(DataGridView)sender].GetChanges();
+            //if (changes != null)
+            //currentAdapters[(DataGridView)sender].Update(changes);
         }
     }
 }

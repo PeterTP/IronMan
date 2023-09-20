@@ -238,6 +238,23 @@ namespace IronMan
                         dataResults["unit"] = row.Cells[2].Value.ToString();
                         dataResults["judgement"] = row.Cells[3].Value.ToString();
                         dataResults["action_sheet"] = row.Cells[4].Value.ToString();
+
+                        string insertSql = String.Format(
+                            insertSqlTemplate,
+                            dataResults["ironman_process"],
+                            dataResults["machine_id"],
+                            dataResults["entry_date"],
+                            dataResults["product_name"],
+                            dataResults["lot_nos"],
+                            dataResults["emp_id"],
+                            dataResults["field"],
+                            dataResults["vl"],
+                            dataResults["unit"],
+                            dataResults["judgement"],
+                            dataResults["action_sheet"]
+                        );
+
+                        parent.ExecuteSql(insertSql);
                     }
 
                     //OdbcCommand cmd = new OdbcCommand(insertSqlTemplate, parent.postgreSQLConn);
@@ -255,23 +272,6 @@ namespace IronMan
                     //        cmd.Parameters['@' + data.Key].Value = data.Value;
                     //    }
                     //}
-
-                    string insertSql = String.Format(
-                        insertSqlTemplate,
-                        dataResults["ironman_process"],
-                        dataResults["machine_id"],
-                        dataResults["entry_date"],
-                        dataResults["product_name"],
-                        dataResults["lot_nos"],
-                        dataResults["emp_id"],
-                        dataResults["field"],
-                        dataResults["vl"],
-                        dataResults["unit"],
-                        dataResults["judgement"],
-                        dataResults["action_sheet"]
-                    );
-
-                    parent.ExecuteSql(insertSql);
                 }
             }
             catch (Exception ex)
