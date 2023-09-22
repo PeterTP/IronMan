@@ -7,7 +7,6 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.Header;
 
 namespace IronMan
 {
@@ -15,9 +14,8 @@ namespace IronMan
     {
         public MainForm parent;
         public DataTable configDataTable;
-        public string processLine;
-        public string process;
-        public Dictionary<string, DataGridView> dataGrids; // Used to reference datagrid using page name
+        public string[] processLine;
+        public string processName;
 
         public SecondaryForm()
         {
@@ -30,7 +28,7 @@ namespace IronMan
         //    ProcessLabel.Text = a;
         //}
 
-        private DataGridView CreateDataGrid(TabPage tabPage, string subGroup)
+        private DataGridView CreateDataGrid(DataTabPage tabPage, string subGroup)
         {
             // Get subgroup table
             HashSet<string> subGroupSet = new HashSet<string>();
@@ -85,16 +83,25 @@ namespace IronMan
             foreach (DataRow row in configDataTable.Rows)
             {
                 string[] itemArr = row["sublevel"].ToString().Split('_');
-                if (!itemArr[0].StartsWith(processLine))
-                    row.Delete();
+                bool isValid = false;
+                if (itemArr.Length-1 == processLine.Length)
+                {
+                    for (int i = 0; i < itemArr.Length - 1; i++)
+                    {
+                        if (itemArr[i] == processLine[i]) isValid = true;
+                        break;
+                    }
+                }
+
+                if (!isValid) row.Delete();
             };
             configDataTable.AcceptChanges();
 
             // Create tabs and datagrids
-            if (configDataTable.Rows.Count == 1 && configDataTable.Rows[0]["sublevel"].ToString() == processLine)
+            if (configDataTable.Rows.Count == 1 && configDataTable.Rows[0]["sublevel"].ToString() == processLine[0])
             {
-                string tabName = processLine;
-                TabPage tabPage = new TabPage
+                string tabName = processLine[0];
+                DataTabPage tabPage = new DataTabPage
                 {
                     Text = tabName,
                     Name = tabName + "TabPage",
@@ -102,7 +109,7 @@ namespace IronMan
                 };
 
                 DataGridView dataGrid = CreateDataGrid(tabPage, configDataTable.Rows[0]["subgroup"].ToString());
-                dataGrids.Add(tabName, dataGrid);
+                tabPage.dataGrid = dataGrid;
                 tabPage.Controls.Add(dataGrid);
                 //Must set padding after adding the dataGrid so it can resize the datagrid
                 tabPage.Padding = new Padding(4);
@@ -112,8 +119,9 @@ namespace IronMan
             {
                 foreach (DataRow row in configDataTable.Rows)
                 {
-                    string tabName = row["sublevel"].ToString().Split('_')[1];
-                    TabPage tabPage = new TabPage
+                    string[] levels = row["sublevel"].ToString().Split('_');
+                    string tabName = levels[levels.Length-1];
+                    DataTabPage tabPage = new DataTabPage
                     {
                         Text = tabName,
                         Name = tabName + "TabPage",
@@ -121,7 +129,7 @@ namespace IronMan
                     };
 
                     DataGridView dataGrid = CreateDataGrid(tabPage, row["subgroup"].ToString());
-                    dataGrids.Add(tabName, dataGrid);
+                    tabPage.dataGrid = dataGrid;
                     tabPage.Controls.Add(dataGrid);
                     //Must set padding after adding the dataGrid so it can resize the datagrid
                     tabPage.Padding = new Padding(4);
@@ -132,10 +140,9 @@ namespace IronMan
 
         private void SecondaryForm_Load(object sender, EventArgs e)
         {
-            Text = process;
-            ProcessLabel.Text = process;
-            ProcessLineComboBox.Text = processLine;
-            dataGrids = new Dictionary<string, DataGridView>();
+            Text = processName;
+            ProcessLabel.Text = processName;
+            ProcessLineComboBox.Text = processLine[0];
             if (configDataTable.Rows[0]["subgroup"].ToString() != "")
                 InititalizeTabs();
             else
@@ -150,7 +157,7 @@ namespace IronMan
             {
                 double value = Convert.ToDouble(((DataGridView)sender)[e.ColumnIndex, e.RowIndex].Value);
                 string field = ((DataGridView)sender)[0, e.RowIndex].Value.ToString();
-                string sub_level = processLine + '_' + TabControl.SelectedTab.Text;
+                string sub_level = string.Join("_", processLine);
 
                 DataTable specDataTable = new DataTable();
                 string specSql = string.Format("select * from public.ironman_specs where public.ironman_specs.sub_level = '{0}'", sub_level);
@@ -211,8 +218,8 @@ namespace IronMan
 
             Dictionary<string, string> dataResults = new Dictionary<string, string>
             {
-                {"ironman_process", process},
-                {"machine_id", processLine},
+                {"ironman_process", processName},
+                {"machine_id", processLine[0]}, // TODO WARN Machine id?
                 {"entry_date", DateTime.Now.ToString("s")},
                 {"product_name", ProductNameComboBox.Text.ToString()},
                 {"lot_nos", LotNoComboBox.Text.ToString()},
@@ -226,10 +233,9 @@ namespace IronMan
 
             try
             {
-
-                foreach (TabPage page in TabControl.TabPages)
+                foreach (DataTabPage page in TabControl.TabPages)
                 {
-                    DataGridView dataGrid = dataGrids[page.Text];
+                    DataGridView dataGrid = page.dataGrid;
 
                     foreach (DataGridViewRow row in dataGrid.Rows)
                     {
@@ -283,5 +289,10 @@ namespace IronMan
                 MessageBox.Show("Saved Successfully!");
             }
         }
+    }
+
+    public class DataTabPage : TabPage
+    {
+        public DataGridView dataGrid;
     }
 }

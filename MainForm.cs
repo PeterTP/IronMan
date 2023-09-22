@@ -4,6 +4,7 @@ using System.Data;
 using System.Data.Odbc;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Windows.Forms;
 //using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
@@ -151,13 +152,56 @@ namespace IronMan
             currentMainLevel = mainKey;
             currentDataTable = dt;
 
+            ButtonMenu.Items.Clear();
             if (subKey != null)
             {
                 foreach (DataRow row in dt.Rows)
                 {
-                    string item = row["sublevel"].ToString().Split('_')[0];
-                    if (item.StartsWith(subKey) && char.IsDigit(item[subKey.Length]))
-                        itemSet.Add(item);
+                    string[] levels = row["sublevel"].ToString().Split('_');
+                    string line = levels[0];
+                    if (line.StartsWith(subKey) && char.IsDigit(line[subKey.Length]))
+                    {
+                        ProcessMenuItem currentItem = null;
+
+                        foreach (ProcessMenuItem item in ButtonMenu.Items)
+                            if (item.Text == line) { currentItem = item; break; }
+
+                        if (currentItem == null)
+                        {
+                            ProcessMenuItem lineItem = new ProcessMenuItem
+                            {
+                                Text = line,
+                                processPath = line
+                            };
+                            ButtonMenu.Items.Add(lineItem);
+                            currentItem = lineItem;
+                        }
+
+                        for (int i = 0; i < levels.Length - 2; i++) // -2 beacause we ignore last value as well
+                        {
+                            bool containsItem = false;
+
+                            foreach (ProcessMenuItem item in currentItem.DropDownItems)
+                                if (item.Text == levels[i + 1])
+                                {
+                                    containsItem = true;
+                                    currentItem = item;
+                                    break;
+                                }
+
+                            if (!containsItem)
+                            {
+                                ProcessMenuItem item = new ProcessMenuItem
+                                {
+                                    Text = levels[i + 1],
+                                    processPath = currentItem.processPath + '_' + levels[i + 1]
+                                };
+                                if (i == levels.Length - 3) item.Click += CurrentItem_Click;
+                                currentItem.DropDownItems.Add(item);
+                                currentItem = item;
+                            }
+                        }
+                    }
                 }
             }
             else
@@ -165,10 +209,6 @@ namespace IronMan
                 foreach (DataRow row in dt.Rows)
                     itemSet.Add(row["sublevel"].ToString().Split('_')[0]);
             }
-
-            ButtonMenu.Items.Clear();
-            foreach (string item in itemSet)
-                ButtonMenu.Items.Add(item);
             ButtonMenu.Show(button, new Point(0, button.Height));
         }
 
@@ -211,15 +251,24 @@ namespace IronMan
 
         private void MainForm_Load(object sender, EventArgs e)
         {
-            FormulationLinesGroupBox.Visible = false;
-            KneadingLinesGroupBox.Visible = false;
             ResetColors();
             CreateConn();
         }
 
+        private void CurrentItem_Click(object sender, EventArgs e)
+        {
+            CreateForm(((ProcessMenuItem)sender).processPath);
+        }
+
         private void ButtonMenu_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
-            var formLocation = this.Location;
+            ProcessMenuItem item = (ProcessMenuItem)e.ClickedItem;
+            CreateForm(item.processPath);
+        }
+
+        private void CreateForm(string processPath)
+        {
+            Point formLocation = this.Location;
             formLocation.Offset(this.Size.Width, 0);
 
             SecondaryForm form = new SecondaryForm
@@ -227,25 +276,25 @@ namespace IronMan
                 Location = formLocation,
                 parent = this,
                 configDataTable = currentDataTable,
-                processLine = e.ClickedItem.Text,
+                processLine = processPath.Split('_'),
             };
 
             switch (currentMainLevel)
             {
                 case "raw_material":
-                    form.process = "Raw Material";
+                    form.processName = "Raw Material";
                     break;
                 case "formulation":
-                    form.process = "Formulation Line";
+                    form.processName = "Formulation Line";
                     break;
                 case "kneading":
-                    form.process = "Kneading Line";
+                    form.processName = "Kneading Line";
                     break;
                 case "tabletting":
-                    form.process = "Tabletting Line";
+                    form.processName = "Tabletting Line";
                     break;
                 case "side_process":
-                    form.process = "Side Process";
+                    form.processName = "Side Process";
                     break;
             }
 
@@ -261,13 +310,11 @@ namespace IronMan
         private void FormulationLinesButton_Click(object sender, EventArgs e)
         {
             InstantiateMenu(FormulationLinesButton, "formulation", "F");
-            SetButtonProperties(FormulationLinesButton, FormulationLinesGroupBox);
         }
 
         private void KneadingLinesButton_Click(object sender, EventArgs e)
         {
             InstantiateMenu(KneadingLinesButton, "kneading", "K");
-            SetButtonProperties(KneadingLinesButton, KneadingLinesGroupBox);
         }
 
         private void TablettingLinesButton_Click(object sender, EventArgs e)
@@ -279,51 +326,16 @@ namespace IronMan
         private void SideProcessButton_Click(object sender, EventArgs e)
         {
             InstantiateMenu(SideProcessButton, "side_process", null);
-            SetButtonProperties(SideProcessButton, SideProcessGroupBox);
         }
 
         private void ExitButton_Click(object sender, EventArgs e)
         {
             Application.Exit();
         }
+    }
 
-        private void F1Button_Click(object sender, EventArgs e)
-        {
-            SetButtonProperties(F1Button);
-            SecondaryForm form = new SecondaryForm();
-            form.ShowDialog();
-        }
-
-        private void F2Button_Click(object sender, EventArgs e)
-        {
-            SetButtonProperties(F2Button);
-            SecondaryForm form = new SecondaryForm();
-            form.ShowDialog();
-        }
-
-        private void K1Button_Click(object sender, EventArgs e)
-        {
-            SetButtonProperties(K1Button);
-        }
-
-        private void K2Button_Click(object sender, EventArgs e)
-        {
-            SetButtonProperties(K1Button);
-        }
-
-        private void K3Button_Click(object sender, EventArgs e)
-        {
-            SetButtonProperties(K3Button);
-        }
-
-        private void ProductRecrushButton_Click(object sender, EventArgs e)
-        {
-            SetButtonProperties(ProductRecrushButton);
-        }
-
-        private void OffLineMagnetButton_Click(object sender, EventArgs e)
-        {
-            SetButtonProperties(OffLineMagnetButton);
-        }
+    public class ProcessMenuItem : ToolStripMenuItem
+    {
+        public string processPath = "";
     }
 }
